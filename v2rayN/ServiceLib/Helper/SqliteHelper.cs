@@ -19,7 +19,8 @@ public sealed class SQLiteHelper
         _db.ExecuteScalar<string>("PRAGMA journal_mode=WAL");   // 返回结果集,须用 Scalar
         _db.Execute("PRAGMA synchronous=NORMAL");
         _db.Execute("PRAGMA cache_size=20000");
-
+        // 修复: _dbAsync 必须初始化 (之前缺失导致 InsertAllAsync NullReferenceException)
+        _dbAsync = new SQLiteAsyncConnection(dbPath, false);
     }
 
     public CreateTableResult CreateTable<T>()
