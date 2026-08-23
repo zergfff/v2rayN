@@ -7,6 +7,7 @@ public class JsonUtils
     private static readonly JsonSerializerOptions _defaultDeserializeOptions = new()
     {
         PropertyNameCaseInsensitive = true,
+        AllowTrailingCommas = true,
         ReadCommentHandling = JsonCommentHandling.Skip
     };
 

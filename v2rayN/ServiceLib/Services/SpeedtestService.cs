@@ -9,7 +9,7 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
     private readonly Func<SpeedTestResult, Task>? _updateFunc = updateFunc;
     private static readonly ConcurrentBag<string> _lstExitLoop = [];
     private readonly int _speedTestPageSize = config.SpeedTestItem.SpeedTestPageSize ?? Global.SpeedTestPageSize;
-    private readonly TimeSpan _delayInterval = TimeSpan.FromSeconds(config.SpeedTestItem.SpeedTestDelayInterval ?? 1);
+    private readonly TimeSpan _delayInterval = TimeSpan.FromMilliseconds(config.SpeedTestItem.SpeedTestDelayInterval ?? 100);
 
     public void RunLoop(ESpeedActionType actionType, List<ProfileItem> selecteds)
     {
