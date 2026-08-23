@@ -13,9 +13,13 @@ public sealed class SQLiteHelper
 
     public SQLiteHelper()
     {
-        _connstr = Utils.GetConfigPath(_configDB);
-        _db = new SQLiteConnection(_connstr, false);
-        _dbAsync = new SQLiteAsyncConnection(_connstr, false);
+        // 性能优化: WAL + Normal 同步 + 大页缓存 (sqlite-net 需 open 后执行 PRAGMA)
+        var dbPath = Utils.GetConfigPath(_configDB);
+        _db = new SQLiteConnection(dbPath, false);
+        _db.ExecuteScalar<string>("PRAGMA journal_mode=WAL");   // 返回结果集,须用 Scalar
+        _db.Execute("PRAGMA synchronous=NORMAL");
+        _db.Execute("PRAGMA cache_size=20000");
+
     }
 
     public CreateTableResult CreateTable<T>()

@@ -30,5 +30,7 @@
         <PublishReadyToRun>true</PublishReadyToRun>
         <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
         <ServerGarbageCollector>false</ServerGarbageCollector>
+        <TieredPGO>true</TieredPGO>
+        <TieredCompilationQuickJitForLoops>true</TieredCompilationQuickJitForLoops>
     </PropertyGroup>
 </Project>

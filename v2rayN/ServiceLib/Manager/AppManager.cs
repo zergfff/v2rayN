@@ -82,16 +82,21 @@ public sealed class AppManager
             Environment.SetEnvironmentVariable("DOTNET_EnableWriteXorExecute", "0", EnvironmentVariableTarget.User);
         }
 
-        SQLiteHelper.Instance.CreateTable<SubItem>();
-        SQLiteHelper.Instance.CreateTable<ProfileItem>();
-        SQLiteHelper.Instance.CreateTable<ServerStatItem>();
-        SQLiteHelper.Instance.CreateTable<RoutingItem>();
-        SQLiteHelper.Instance.CreateTable<ProfileExItem>();
-        SQLiteHelper.Instance.CreateTable<DNSItem>();
-        SQLiteHelper.Instance.CreateTable<FullConfigTemplateItem>();
+        // 性能优化: 并行建表 (WAL 模式下安全)
+        var tables = new Action[]
+        {
+            () => SQLiteHelper.Instance.CreateTable<SubItem>(),
+            () => SQLiteHelper.Instance.CreateTable<ProfileItem>(),
+            () => SQLiteHelper.Instance.CreateTable<ServerStatItem>(),
+            () => SQLiteHelper.Instance.CreateTable<RoutingItem>(),
+            () => SQLiteHelper.Instance.CreateTable<ProfileExItem>(),
+            () => SQLiteHelper.Instance.CreateTable<DNSItem>(),
+            () => SQLiteHelper.Instance.CreateTable<FullConfigTemplateItem>(),
 #pragma warning disable CS0618
-        SQLiteHelper.Instance.CreateTable<ProfileGroupItem>();
+            () => SQLiteHelper.Instance.CreateTable<ProfileGroupItem>(),
 #pragma warning restore CS0618
+        };
+        Parallel.Invoke(tables);
         return true;
     }
 
@@ -104,10 +109,11 @@ public sealed class AppManager
         _ = StatePort;
         _ = StatePort2;
 
-        Task.Run(async () =>
+        // 性能优化: 迁移任务后台执行,不阻塞窗口显示
+        _ = Task.Run(async () =>
         {
             await MigrateProfileExtra();
-        }).Wait();
+        });
 
         return true;
     }

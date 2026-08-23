@@ -58,10 +58,12 @@ public class StatisticsSingboxService
 
         while (!_exitFlag)
         {
-            await Task.Delay(1000);
+            // 性能优化: 核心未运行时降频空转 (1s -> 5s)
+            var coreRunning = AppManager.Instance.IsRunningCore(ECoreType.sing_box);
+            await Task.Delay(coreRunning ? 1000 : 5000);
             try
             {
-                if (!AppManager.Instance.IsRunningCore(ECoreType.sing_box))
+                if (!coreRunning)
                 {
                     continue;
                 }

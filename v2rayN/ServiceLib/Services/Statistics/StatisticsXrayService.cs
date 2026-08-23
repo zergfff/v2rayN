@@ -27,10 +27,12 @@ public class StatisticsXrayService
     {
         while (!_exitFlag)
         {
-            await Task.Delay(1000);
+            // 性能优化: 核心未运行时降频空转 (1s -> 5s), 减少无谓唤醒
+            var coreRunning = AppManager.Instance.RunningCoreType == ECoreType.Xray;
+            await Task.Delay(coreRunning ? 1000 : 5000);
             try
             {
-                if (AppManager.Instance.RunningCoreType != ECoreType.Xray)
+                if (!coreRunning)
                 {
                     continue;
                 }
