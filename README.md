@@ -1,80 +1,40 @@
-# v2rayN
+# v2rayN (zergfff 定制优化版)
 
-### A GUI client for Windows, Linux and macOS. Support [Xray](https://github.com/XTLS/Xray-core) and [sing-box](https://github.com/SagerNet/sing-box) and [others](https://github.com/2dust/v2rayN/wiki/List-of-supported-cores)
+基于 [2dust/v2rayN](https://github.com/2dust/v2rayN) 的 Windows x64 定制版，针对性能精简。
 
-[![CodeFactor](https://www.codefactor.io/repository/github/2dust/v2rayn/badge)](https://www.codefactor.io/repository/github/2dust/v2rayn)
-[![Release](https://img.shields.io/github/v/release/2dust/v2rayN?logo=github&label=Release)](https://github.com/2dust/v2rayN/releases)
-[![Downloads](https://img.shields.io/github/downloads/2dust/v2rayN/latest/total?logo=github&label=Downloads)](https://github.com/2dust/v2rayN/releases)
-[![Telegram](https://img.shields.io/badge/Telegram-Chat-26A5E4?logo=telegram)](https://t.me/v2rayn)
- 
-[![Windows](https://img.shields.io/badge/Windows-supported-0078D6?logo=windows)](https://github.com/2dust/v2rayN) 
-[![Linux](https://img.shields.io/badge/Linux-supported-FCC624?logo=linux&logoColor=000)](https://github.com/2dust/v2rayN) 
-[![macOS](https://img.shields.io/badge/macOS-supported-000000?logo=apple)](https://github.com/2dust/v2rayN) 
-[![GPG Signed](https://img.shields.io/badge/GPG-signed-4B32C3?logo=gnuprivacyguard)](https://github.com/2dust/v2rayN)
+## 与原版的差异
 
+### 性能优化
+- **ReadyToRun 预编译** — 冷启动 ~0.6s（原版 ~5.4s）
+- **TieredPGO** + Workstation GC
+- **SQLite WAL** 模式 + NORMAL 同步 + 20MB 页缓存
+- **TCPing 全量并发**（取消分批）
+- **真连接测速批间延迟 1s → 100ms**
+- **日志截断**：超限保留最近一半，后台长跑内存不涨
+- **统计服务空闲降频**：核心未运行时空转 1s → 5s
+- **迁移任务/建表并行化**，不阻塞启动
 
----
+### 功能裁剪
+- ❌ 订阅功能（分组胶囊、订阅菜单、导入订阅URL）—— 节点用剪贴板批量导入或手动添加
+- ❌ 帮助 / 推广菜单
+- ❌ 程序自更新（防止覆盖定制版）
+- ✅ **内核更新保留**（sing-box / xray 等仍可在检查更新里升级）
 
-## Download / 下载
+## 使用
 
-Download the latest release here:
+从 [Releases](https://github.com/zergfff/v2rayN/releases) 下载 zip，解压后把 `v2rayN.exe` 和 4 个 dll 放进你的 v2rayN 目录（或直接解压到空目录使用），需要 `bin/sing_box/sing-box.exe` 等核心文件。
 
-在这里下载最新版本：
+节点导入：复制 vmess://vless://trojan://ss://hy2:// 链接后在主界面按 Ctrl+V。
 
-[https://github.com/2dust/v2rayN/releases](https://github.com/2dust/v2rayN/releases)
+## 自动构建
 
+推送到 master 自动触发 GitHub Actions 编译 win-x64 R2R 版本并发布到 Releases（保留最近 3 个）。
 
-> [!TIP]
-> v2rayN is the desktop version. For the mobile version, please visit the v2rayNG \
-> v2rayN 是电脑版，手机版请访问 v2rayNG
->
-> https://github.com/2dust/v2rayNG
-
----
-
-## Documentation / 使用文档
-
-Read the Wiki for usage guides and configuration details.
-
-请阅读 Wiki 获取使用说明和配置教程。
-
-[https://github.com/2dust/v2rayN/wiki](https://github.com/2dust/v2rayN/wiki)
-
----
-
-## Supported Platforms / 支持平台
-
-| Platform / 平台 | x64 | x86 | arm64 | riscv64 | loong64 |
-| --- | --- | --- | --- | --- | --- |
-| Windows | ✅ | ✅ | ✅ | - | - |
-| Linux | ✅ | - | ✅ | ✅ | ✅ |
-| macOS | ✅ | - | ✅ | - | - |
-
-Minimum OS requirements: [Release files introduction](https://github.com/2dust/v2rayN/wiki/Release-files-introduction) / 最低系统要求：[发布文件介绍](https://github.com/2dust/v2rayN/wiki/Release-files-introduction)
-
----
-
-## GPG Verification / GPG 签名校验
-
-Release files are signed with GPG to verify authenticity and integrity, helping prevent mirror, ISP, or CDN hijacking.
-
-发布文件已使用 GPG 签名，可用于校验文件真实性与完整性，预防镜像站、运营商或 CDN 劫持。
-
-### Fingerprint / 公钥指纹
-
-```text
-7694 5E9F 3E9A 168F 8070 F195 805D 661C
-134D FAF6 8903 C199 463C 31E5 AE90 3AE0
+本地编译：
+```bash
+dotnet publish v2rayN/v2rayN.Desktop/v2rayN.Desktop.csproj -c Release -r win-x64
 ```
 
----
+## License
 
-## Community / 社区
-
-Telegram Group / Telegram 群组：
-
-[https://t.me/v2rayN](https://t.me/v2rayN)
-
-Telegram Channel / Telegram 频道：
-
-[https://t.me/github_2dust](https://t.me/github_2dust)
+GPL-3.0（继承自上游）

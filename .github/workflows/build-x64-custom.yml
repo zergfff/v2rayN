@@ -1,0 +1,61 @@
+name: Build Windows x64
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish (win-x64, R2R)
+        run: >
+          dotnet publish v2rayN/v2rayN.Desktop/v2rayN.Desktop.csproj
+          -c Release -r win-x64 --self-contained true
+          -o ./release
+
+      - name: Package zip
+        shell: pwsh
+        run: |
+          $tag = "v$(Get-Date -Format 'yyyy.MM.dd').x64"
+          Compress-Archive -Path ./release/* -DestinationPath "./v2rayN-custom-$tag-win-x64.zip"
+          "TAG=$tag" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Delete old releases (keep latest 3)
+        shell: pwsh
+        run: |
+          $releases = gh release list --limit 100 --json tagName --jq '.[].tagName' 2>$null
+          if ($releases) {
+            $old = $releases | Select-Object -Skip 3
+            foreach ($t in $old) { gh release delete $t --yes --cleanup-tag 2>$null }
+          }
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Create Release & Upload
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: v2rayN Custom x64 (${{ env.TAG }})
+          body: |
+            定制优化版 v2rayN (Windows x64)
+            - ReadyToRun 预编译 (启动 ~0.6s)
+            - SQLite WAL / TieredPGO / 全量并发测速
+            - 已去除: 订阅分组、帮助、推广、程序自更新
+            - 内核更新保留; 请自备 sing-box/xray 核心
+          files: ./v2rayN-custom-*.zip
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
