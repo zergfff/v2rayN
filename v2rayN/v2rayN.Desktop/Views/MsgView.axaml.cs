@@ -43,7 +43,10 @@ public partial class MsgView : ReactiveUserControl<MsgViewModel>
         //}
         if (txtMsg.LineCount > ViewModel?.NumMaxMsg)
         {
-            ClearMsg();
+            // 截断保留最近一半日志,而非整页清空 (避免丢上下文且降低 UI 抖动)
+            var lineCount = txtMsg.LineCount;
+            var cutLine = txtMsg.Document.GetLineByNumber(lineCount - (ViewModel.NumMaxMsg / 2));
+            txtMsg.Document.Remove(0, cutLine.Offset);
         }
 
         txtMsg.AppendText(msg.ToString());

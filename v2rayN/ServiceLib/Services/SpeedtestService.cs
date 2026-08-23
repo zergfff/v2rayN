@@ -137,8 +137,8 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
 
     private async Task RunTcpingAsync(List<ServerTestItem> selecteds, string exitLoopKey)
     {
-        var pageSize = Math.Min(selecteds.Count, _speedTestPageSize);
-        var lstBatch = GetTestBatchItem(selecteds, pageSize);
+        // 全量并发: 单批放下全部节点 (Win11 x64 大内存优化)
+        var lstBatch = GetTestBatchItem(selecteds, selecteds.Count);
 
         foreach (var lst in lstBatch)
         {

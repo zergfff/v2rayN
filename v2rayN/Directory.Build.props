@@ -27,6 +27,8 @@
 
         <UseSystemResourceKeys>true</UseSystemResourceKeys>
         <PublishSingleFile>true</PublishSingleFile>
-        <PublishReadyToRun>false</PublishReadyToRun>
+        <PublishReadyToRun>true</PublishReadyToRun>
+        <PublishReadyToRunComposite>true</PublishReadyToRunComposite>
+        <ServerGarbageCollector>false</ServerGarbageCollector>
     </PropertyGroup>
 </Project>
